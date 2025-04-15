@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKU Activation Prompt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+         
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --gradient-start: #4361ee;
+            --gradient-end: #3a0ca3;
+            --text-dark: #2b2d42;
+            --text-light: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #3a0ca3, #4361ee, #4cc9f0, #f72585);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            perspective: 1000px;
+        }
+        .panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .panel:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            border-radius: 2px;
+        }
+        h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        select, input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(67, 97, 238, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.2);
+        }
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(58, 12, 163, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 12, 163, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #b5179e);
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .info-card {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .info-card:hover {
+            transform: translateX(5px);
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.15), rgba(58, 12, 163, 0.15));
+        }
+        .info-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+        }
+        .info-item strong {
+            color: var(--secondary);
+            width: 180px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .info-item span {
+            word-break: break-word;
+        }
+        .text-display {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 150px;
+            border: 2px dashed rgba(67, 97, 238, 0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+            white-space: pre-line;
+        }
+        .text-display:hover {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .copy-message {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .visible {
+            opacity: 1;
+        }
+        .converter-box {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(67, 97, 238, 0.2);
+        }
+        .mac-result {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(76, 201, 240, 0.1);
+            border-radius: 12px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        .mac-result:hover {
+            background: rgba(76, 201, 240, 0.2);
+            transform: scale(1.02);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(67, 97, 238, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+        }
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel -->
+        <div class="panel">
+            <h2>MAC Extractor</h2>
+            <textarea id="inputText" rows="10" placeholder="Paste the text here"></textarea>
+            <button class="btn" onclick="extractData()">Extract Data</button>
+            <div class="converter-box">
+                <div class="copy-message" id="copySuccess" style="opacity:0;">Data extracted successfully!</div>
+            </div>
+            <div class="results">
+                <h3>Extracted Results:</h3>
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Mobility/Fixed</th>
+                            <th>Customer</th>
+                            <th>MAC Address (Formatted)</th>
+                            <th>MAC Address (Unformatted)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Right Panel -->
+        <div class="panel">
+            <h2>MAC Address Converter</h2>
+            <p>Enter a MAC address below:</p>
+            <input type="text" id="macInput" placeholder="Enter MAC Address">
+            <button class="btn" onclick="convertMacAddress()">Convert</button>
+            <div class="mac-result" id="macResult" style="display:none;"></div>
+            <div class="converter-box">
+                <div class="copy-message" id="copyMacSuccess" style="opacity:0;">MAC Address copied!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add event listeners
+            addEventListeners();
+        });
+
+        function addEventListeners() {
+            document.getElementById('macInput').addEventListener('input', validateMacInput);
+            document.getElementById('macResult').addEventListener('click', copyMacResult);
+            document.getElementById('inputText').addEventListener('input', validateInput);
+        }
+
+        function validateInput(event) {
+            const input = event.target.value;
+            if (!input) {
+                document.getElementById('resultsBody').innerHTML = '';
+            }
+        }
+
+        function extractData() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) return;
+
+            const lines = input.split(/(?=\s*AKU)/); // Split by occurrences of "AKU"
+            const results = [];
+
+            lines.forEach(line => {
+                const match = line.match(/^AKU-\w+-([A-Z]+)-(\w+)\.005-(\w+)/);
+                if (match) {
+                    const [, mobilityFixed, customer, mac] = match;
+                    const formattedMac = mac.match(/.{1,2}/g).join(':').toUpperCase();
+                    results.push({
+                        mobilityFixed,
+                        customer,
+                        macFormatted: formattedMac,
+                        macUnformatted: mac.toUpperCase()
+                    });
+                }
+            });
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = ''; // Clear previous results
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No data found.</td></tr>';
+                return;
+            }
+
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${result.mobilityFixed}</td>
+                    <td>${result.customer}</td>
+                    <td>${result.macFormatted}</td>
+                    <td>${result.macUnformatted}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Show success message
+            const successMessage = document.getElementById('copySuccess');
+            successMessage.classList.add('visible');
+            setTimeout(() => successMessage.classList.remove('visible'), 2000);
+        }
+
+        function validateMacInput(event) {
+            const input = event.target.value;
+            const isValid = /^[0-9A-Fa-f]{12}$/.test(input) || /^[0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}$/.test(input);
+            if (!isValid) {
+                alert("Invalid MAC Address Format");
+            }
+        }
+
+        function convertMacAddress() {
+            const input = document.getElementById('macInput').value.trim();
+            if (!input) return;
+
+            let result;
+            if (input.includes(':') || input.includes('-')) {
+                result = input.replace(/[:\-]/g, '').toUpperCase();
+            } else {
+                const clean = input.replace(/[^a-fA-F0-9]/g, '');
+                if (clean.length !== 12) {
+                    alert('Invalid MAC: must be 12 hex chars');
+                    return;
+                }
+                result = clean.match(/.{1,2}/g).join(':').toUpperCase();
+            }
+
+            const resultElement = document.getElementById('macResult');
+            resultElement.textContent = result;
+            resultElement.style.display = 'block';
+        }
+
+        function copyMacResult() {
+            const mac = document.getElementById('macResult').textContent;
+            copyToClipboard(mac, document.getElementById('copyMacSuccess'));
+        }
+
+        async function copyToClipboard(text, successElement) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showSuccess(successElement);
+            } catch (err) {
+                console.error('Copy failed:', err);
+            }
+        }
+
+        function showSuccess(element) {
+            element.classList.add('visible');
+            setTimeout(() => element.classList.remove('visible'), 2000);
+        }
+    </script>
+</body>
+</html>
