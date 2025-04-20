@@ -283,29 +283,30 @@
             }
         }
 
-        function extractData() {
-            const input = document.getElementById('inputText').value.trim();
-            if (!input) return;
+    function extractData() {
+    const input = document.getElementById('inputText').value.trim();
+    if (!input) return;
 
-            const lines = input.split(/(?=\s*AKU)/); // Split by occurrences of "AKU"
-            const results = [];
+    const lines = input.split(/(?=\s*AKU)/); // Split by occurrences of "AKU"
+    const results = [];
 
-            lines.forEach(line => {
-                const match = line.match(/^AKU-\w+-([A-Z]+)-(\w+)\.005-(\w+)/);
-                if (match) {
-                    const [, mobilityFixed, customer, mac] = match;
-                    const formattedMac = mac.match(/.{1,2}/g).join(':').toUpperCase();
-                    results.push({
-                        mobilityFixed,
-                        customer,
-                        macFormatted: formattedMac,
-                        macUnformatted: mac.toUpperCase()
-                    });
-                }
+    lines.forEach(line => {
+        const match = line.match(/^AKU-PKG-([A-Z]+)-([A-Za-z]+)\.005-([0-9A-Fa-f]{12})/);
+        if (match) {
+            const [, mobilityFixed, customer, mac] = match;
+            const formattedMac = mac.match(/.{1,2}/g).join(':').toUpperCase();
+            results.push({
+                mobilityFixed,
+                customer,
+                macFormatted: formattedMac,
+                macUnformatted: mac.toUpperCase()
             });
-
-            displayResults(results);
         }
+    });
+
+    displayResults(results);
+}
+
 
         function displayResults(results) {
             const tbody = document.getElementById('resultsBody');
