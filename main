@@ -6,7 +6,7 @@
     <title>AKU Activation Prompt</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-         
+        /* Existing CSS styles */
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -84,7 +84,7 @@
             margin-bottom: 15px;
             font-weight: 500;
         }
-        select, input {
+        select, input, textarea {
             width: 100%;
             padding: 15px;
             margin-bottom: 20px;
@@ -94,7 +94,7 @@
             transition: all 0.3s;
             background: rgba(255, 255, 255, 0.8);
         }
-        select:focus, input:focus {
+        select:focus, input:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.2);
@@ -222,7 +222,6 @@
                 width: 100%;
             }
         }
-
     </style>
 </head>
 <body>
@@ -233,7 +232,7 @@
             <textarea id="inputText" rows="10" placeholder="Paste the text here"></textarea>
             <button class="btn" onclick="extractData()">Extract Data</button>
             <div class="converter-box">
-                <div class="copy-message" id="copySuccess" style="opacity:0;">Data extracted successfully!</div>
+                <div class="copy-message" id="macExtractCopySuccess" style="opacity:0;">Data extracted and copied successfully!</div>
             </div>
             <div class="results">
                 <h3>Extracted Results:</h3>
@@ -258,7 +257,29 @@
             <button class="btn" onclick="convertMacAddress()">Convert</button>
             <div class="mac-result" id="macResult" style="display:none;"></div>
             <div class="converter-box">
-                <div class="copy-message" id="copyMacSuccess" style="opacity:0;">MAC Address copied!</div>
+                <div class="copy-message" id="macConvertCopySuccess" style="opacity:0;">MAC Address converted and copied!</div>
+            </div>
+        </div>
+        <!-- iPerf Extractor Panel -->
+        <div class="panel">
+            <h2>iPerf Extractor</h2>
+            <textarea id="iperfInputText" rows="10" placeholder="Paste the iPerf text here"></textarea>
+            <button class="btn" onclick="extractIperfData()">Extract iPerf Data</button>
+            <div class="converter-box">
+                <div class="copy-message" id="iperfCopySuccess" style="opacity:0;">iPerf data extracted and copied successfully!</div>
+            </div>
+            <div class="results">
+                <h3>Extracted iPerf Results:</h3>
+                <table id="iperfResultsTable">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Nominal Speed</th>
+                            <th>Result Header</th>
+                        </tr>
+                    </thead>
+                    <tbody id="iperfResultsBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -272,8 +293,8 @@
 
         function addEventListeners() {
             document.getElementById('macInput').addEventListener('input', validateMacInput);
-            document.getElementById('macResult').addEventListener('click', copyMacResult);
             document.getElementById('inputText').addEventListener('input', validateInput);
+            document.getElementById('iperfInputText').addEventListener('input', validateIperfInput);
         }
 
         function validateInput(event) {
@@ -283,30 +304,37 @@
             }
         }
 
-    function extractData() {
-    const input = document.getElementById('inputText').value.trim();
-    if (!input) return;
-
-    const lines = input.split(/(?=\s*AKU)/); // Split by occurrences of "AKU"
-    const results = [];
-
-    lines.forEach(line => {
-        const match = line.match(/^AKU-PKG-([A-Z]+)-([A-Za-z]+)\.005-([0-9A-Fa-f]{12})/);
-        if (match) {
-            const [, mobilityFixed, customer, mac] = match;
-            const formattedMac = mac.match(/.{1,2}/g).join(':').toUpperCase();
-            results.push({
-                mobilityFixed,
-                customer,
-                macFormatted: formattedMac,
-                macUnformatted: mac.toUpperCase()
-            });
+        function validateIperfInput(event) {
+            const input = event.target.value;
+            if (!input) {
+                document.getElementById('iperfResultsBody').innerHTML = '';
+            }
         }
-    });
 
-    displayResults(results);
-}
+        function extractData() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) return;
 
+            const lines = input.split(/(?=\s*AKU)/); // Split by occurrences of "AKU"
+            const results = [];
+
+            lines.forEach(line => {
+                const match = line.match(/^AKU-PKG-([A-Z]+)-([A-Za-z]+)\.005-([0-9A-Fa-f]{12})/);
+                if (match) {
+                    const [, mobilityFixed, customer, mac] = match;
+                    const formattedMac = mac.match(/.{1,2}/g).join(':').toUpperCase();
+                    results.push({
+                        mobilityFixed,
+                        customer,
+                        macFormatted: formattedMac,
+                        macUnformatted: mac.toUpperCase()
+                    });
+                }
+            });
+
+            displayResults(results);
+            copyResultsToClipboard(results, 'macExtractCopySuccess');
+        }
 
         function displayResults(results) {
             const tbody = document.getElementById('resultsBody');
@@ -326,11 +354,6 @@
                 `;
                 tbody.appendChild(row);
             });
-
-            // Show success message
-            const successMessage = document.getElementById('copySuccess');
-            successMessage.classList.add('visible');
-            setTimeout(() => successMessage.classList.remove('visible'), 2000);
         }
 
         function validateMacInput(event) {
@@ -360,11 +383,63 @@
             const resultElement = document.getElementById('macResult');
             resultElement.textContent = result;
             resultElement.style.display = 'block';
+
+            copyToClipboard(result, document.getElementById('macConvertCopySuccess'));
         }
 
-        function copyMacResult() {
-            const mac = document.getElementById('macResult').textContent;
-            copyToClipboard(mac, document.getElementById('copyMacSuccess'));
+        function extractIperfData() {
+            const input = document.getElementById('iperfInputText').value.trim();
+            if (!input) return;
+
+            const lines = input.split('\n');
+            const results = [];
+
+            lines.forEach(line => {
+                const match = line.match(/Esn: \d+ - Port \d+: (DOWNLOAD|UPLOAD) (TCP|UDP) NominalSpeed (\d+\.\d+) - Result_Header (\d+\.\d+)/);
+                if (match) {
+                    const [, type, protocol, nominalSpeed, resultHeader] = match;
+                    results.push({
+                        type: `${type} ${protocol}`,
+                        nominalSpeed,
+                        resultHeader
+                    });
+                }
+            });
+
+            displayIperfResults(results);
+            copyResultsToClipboard(results, 'iperfCopySuccess');
+        }
+
+        function displayIperfResults(results) {
+            const tbody = document.getElementById('iperfResultsBody');
+            tbody.innerHTML = ''; // Clear previous results
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">No data found.</td></tr>';
+                return;
+            }
+
+            results.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${result.type}</td>
+                    <td>${result.nominalSpeed}</td>
+                    <td>${result.resultHeader}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function copyResultsToClipboard(results, successElementId) {
+            let resultsText = '';
+            if (Array.isArray(results)) {
+                resultsText = results.map(result =>
+                    Object.values(result).join('\t')
+                ).join('\n');
+            } else {
+                resultsText = results;
+            }
+
+            copyToClipboard(resultsText, document.getElementById(successElementId));
         }
 
         async function copyToClipboard(text, successElement) {
